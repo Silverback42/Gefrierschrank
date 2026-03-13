@@ -1,0 +1,20 @@
+version: "3.8"
+
+services:
+  gefrierschrank:
+    container_name: gefrierschrank
+    build: .
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    volumes:
+      - /volume1/docker/gefrierschrank/data:/app/data
+    environment:
+      - TZ=Europe/Berlin
+      - DATABASE_PATH=/app/data/gefrierschrank.db
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
