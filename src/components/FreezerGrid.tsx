@@ -1,7 +1,8 @@
 "use client";
 
-import { useOptimistic, useState, useCallback, useTransition } from "react";
+import { useOptimistic, useState, useCallback, useMemo, useTransition } from "react";
 import type { Product } from "@/lib/types";
+import { sortByAvailability } from "@/lib/sort";
 import ProductTile from "./ProductTile";
 import Header from "./Header";
 import AddProductModal from "./AddProductModal";
@@ -69,6 +70,12 @@ export default function FreezerGrid({ initialItems }: FreezerGridProps) {
         return state;
     }
   });
+
+  // Volle Produkte nach vorne, leere Produkte automatisch ans Ende
+  const sortedItems = useMemo(
+    () => sortByAvailability(optimisticItems),
+    [optimisticItems]
+  );
 
   const handleIncrement = useCallback(
     (id: number) => {
@@ -179,10 +186,10 @@ export default function FreezerGrid({ initialItems }: FreezerGridProps) {
 
   return (
     <>
-      <Header items={optimisticItems} onAddClick={() => setShowAddModal(true)} />
+      <Header items={sortedItems} onAddClick={() => setShowAddModal(true)} />
 
       <main className="p-4 md:p-6 pb-24">
-        {optimisticItems.length === 0 ? (
+        {sortedItems.length === 0 ? (
           <div className="flex flex-col items-center justify-center min-h-[50dvh] gap-4">
             <span className="text-6xl">{"\u{2744}\u{FE0F}"}</span>
             <p className="text-lg text-[var(--color-text-muted)] text-center">
@@ -199,7 +206,7 @@ export default function FreezerGrid({ initialItems }: FreezerGridProps) {
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
-            {optimisticItems.map((product) => (
+            {sortedItems.map((product) => (
               <ProductTile
                 key={product.id}
                 product={product}
