@@ -1,7 +1,14 @@
 "use client";
 
-import { useOptimistic, useState, useCallback, useTransition } from "react";
+import {
+  useOptimistic,
+  useState,
+  useCallback,
+  useMemo,
+  useTransition,
+} from "react";
 import type { Product } from "@/lib/types";
+import { sortByFillState } from "@/lib/sort";
 import ProductTile from "./ProductTile";
 import Header from "./Header";
 import AddProductModal from "./AddProductModal";
@@ -69,6 +76,12 @@ export default function FreezerGrid({ initialItems }: FreezerGridProps) {
         return state;
     }
   });
+
+  // Leere Produkte wandern sofort ans Ende, aufgefuellte nach vorne
+  const sortedItems = useMemo(
+    () => sortByFillState(optimisticItems),
+    [optimisticItems]
+  );
 
   const handleIncrement = useCallback(
     (id: number) => {
@@ -199,7 +212,7 @@ export default function FreezerGrid({ initialItems }: FreezerGridProps) {
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
-            {optimisticItems.map((product) => (
+            {sortedItems.map((product) => (
               <ProductTile
                 key={product.id}
                 product={product}

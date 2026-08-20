@@ -6,7 +6,10 @@ import type { Product, ActivityLogEntry } from "./types";
 
 export async function getItems(): Promise<Product[]> {
   const rows = db
-    .prepare("SELECT * FROM products ORDER BY sort_order ASC, name ASC")
+    .prepare(
+      // Leere Produkte (Menge 0) ans Ende, volle nach vorne
+      "SELECT * FROM products ORDER BY (quantity = 0) ASC, sort_order ASC, name ASC"
+    )
     .all() as Product[];
   return rows;
 }
