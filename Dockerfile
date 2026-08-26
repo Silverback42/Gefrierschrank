@@ -16,6 +16,11 @@ RUN npm run build
 # Stage 3: Production
 FROM node:20-slim AS runner
 WORKDIR /app
+
+# Verknuepft das Image dauerhaft mit dem Repo, damit GITHUB_TOKEN
+# beim Push nach ghcr.io Schreibrecht auf das Package hat.
+LABEL org.opencontainers.image.source=https://github.com/Silverback42/Gefrierschrank
+
 ENV NODE_ENV=production
 ENV HOSTNAME=0.0.0.0
 ENV PORT=3000
